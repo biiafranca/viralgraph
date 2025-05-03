@@ -1,0 +1,86 @@
+import pandas as pd
+
+# ===================== MAIN DATA =====================
+covid_data = "https://covid.ourworldindata.org/data/owid-covid-data.csv"
+df = pd.read_csv(covid_data)
+df = df[['iso_code', 'location', 'date', 'total_cases', 'total_deaths', 'total_vaccinations']]
+df = df[df['iso_code'].str.len() == 3]  # Filter valid ISO country codes
+
+# Assign unique IDs to each CovidCase and VaccinationStats entry (based on country/date rows)
+df = df.reset_index(drop=True)
+df['covidcase_id'] = range(1, len(df) + 1)
+df['vaccstats_id'] = range(1, len(df) + 1)
+
+# ===================== NODE: Country =====================
+countries = df[['iso_code', 'location']].drop_duplicates().copy()
+countries['id'] = range(1, len(countries) + 1)
+countries.rename(columns={
+    'iso_code': 'iso3',
+    'location': 'name'
+}, inplace=True)
+countries = countries[['id', 'name', 'iso3']]
+countries.to_csv("etl/data/countries.csv", index=False)
+print(f"Saving countries.csv with {len(countries)} rows...")
+
+# ===================== NODE: CovidCase =====================
+df_cases = df.dropna(subset=['date']).dropna(subset=['total_cases', 'total_deaths'], how='all').copy()
+covid_cases = df_cases[['covidcase_id', 'iso_code', 'date', 'total_cases', 'total_deaths']].copy()
+covid_cases.rename(columns={
+    'covidcase_id': 'id',
+    'iso_code': 'country_iso',
+    'total_cases': 'totalCases',
+    'total_deaths': 'totalDeaths'
+}, inplace=True)
+covid_cases.to_csv("etl/data/covid_cases.csv", index=False)
+print(f"Saving covid_cases.csv with {len(covid_cases)} rows...")
+
+# ===================== NODE: VaccinationStats =====================
+df_vacc = df.dropna(subset=['iso_code', 'date', 'total_vaccinations'], how='any').copy()
+vacc_stats = df_vacc[['vaccstats_id', 'iso_code', 'date', 'total_vaccinations']].copy()
+vacc_stats.rename(columns={
+    'vaccstats_id': 'id',
+    'iso_code': 'country_iso',
+    'total_vaccinations': 'totalVaccinated'
+}, inplace=True)
+vacc_stats['totalVaccinated'] = vacc_stats['totalVaccinated'].astype(int)
+vacc_stats.to_csv("etl/data/vaccination_stats.csv", index=False)
+print(f"Saving vaccination_stats.csv with {len(vacc_stats)} rows...")
+
+# ===================== RELATIONSHIP: HAS_CASE =====================
+has_case = covid_cases[['country_iso', 'id']].rename(columns={
+    'id': 'covidcase_id'
+})
+has_case.to_csv("etl/data/has_case.csv", index=False)
+print(f"Saving has_case.csv with {len(has_case)} rows...")
+
+# ===================== RELATIONSHIP: VACCINATED_ON =====================
+vaccinated_on = vacc_stats[['country_iso', 'id']].rename(columns={
+    'id': 'vaccstats_id'
+})
+vaccinated_on.to_csv("etl/data/vaccinated_on.csv", index=False)
+print(f"Saving vaccinated_on.csv with {len(vaccinated_on)} rows...")
+
+# ===================== VACCINE MANUFACTURER DATA =====================
+vac_manuf_url = "https://covid.ourworldindata.org/data/vaccinations/vaccinations-by-manufacturer.csv"
+df_vac_by_manuf = pd.read_csv(vac_manuf_url)
+
+# ===================== NODE: Vaccine =====================
+vaccines = df_vac_by_manuf.groupby('vaccine')['date'].min().reset_index().copy()
+vaccines['id'] = range(1, len(vaccines) + 1)
+vaccines.rename(columns={'date': 'first_global_use'}, inplace=True)
+vaccines.to_csv("etl/data/vaccines.csv", index=False)
+print(f"Saving vaccines.csv with {len(vaccines)} rows...")
+
+# ===================== RELATIONSHIP: USES =====================
+# Map country name to ISO code
+country_iso_map = countries.set_index('name')['iso3'].to_dict()
+uses_raw = df_vac_by_manuf[['location', 'vaccine', 'date']].copy()
+uses_raw['country_iso'] = uses_raw['location'].map(country_iso_map)
+uses_raw = uses_raw.dropna(subset=['country_iso'])
+
+# Keep only the first use per country-vaccine pair
+uses = uses_raw.groupby(['country_iso', 'vaccine'])['date'].min().reset_index()
+uses.rename(columns={'date': 'first_used'}, inplace=True)
+
+uses.to_csv("etl/data/uses.csv", index=False)
+print(f"Saving uses.csv with {len(uses)} rows...")
