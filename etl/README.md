@@ -132,6 +132,10 @@ Consideramos desnecessária a existência de um nó exclusivo para representar o
 Além disso, como a fonte de dados não fornece a data oficial da aprovação regulatória, e sim a data do primeiro uso documentado, usamos esta data como proxy para first_global_use. Já o uso específico por país foi modelado como atributo first_used no relacionamento (:Country)-[:USES]->(:Vaccine).
 Essa modelagem simplifica o grafo, evita nós artificiais e mantém a capacidade de responder às perguntas do desafio de forma clara.
 
+🔸 Uso do chunksize ao carregar os dados
+
+A decisão de usar o parâmetro chunksize foi baseada na necessidade de otimizar a performance e evitar sobrecarga de memória no banco de dados Neo4j. Ao processar os dados em lotes controlados, em vez de usar um tamanho indefinido, garantimos que o sistema não sobrecarregue sua memória ao tentar carregar grandes volumes de dados simultaneamente. Essa abordagem também melhora a eficiência ao balancear as operações de leitura e escrita, facilita a escalabilidade ao lidar com grandes volumes de dados e oferece maior controle sobre erros, permitindo a recuperação eficiente sem comprometer todo o processo.
+
 ---
 
 ## ✅ Exemplo de query possível após a carga
