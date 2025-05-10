@@ -59,6 +59,10 @@ func handleNew(w http.ResponseWriter, country, date string) {
 		`
 		previousQuery = `
 			MATCH (c:Country)-[:HAS_CASE]->(cc:CovidCase)
+			WHERE cc.date = date($date)
+			WITH c
+
+			MATCH (c)-[:HAS_CASE]->(cc:CovidCase)
 			WHERE cc.date < date($date)
 			WITH c, cc ORDER BY cc.date DESC
 			WITH c, collect(cc)[0] AS latest
