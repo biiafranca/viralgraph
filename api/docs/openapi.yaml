@@ -1,0 +1,260 @@
+openapi: 3.0.3
+info:
+  title: ViralGraph API
+  version: "1.0"
+  description: API para consulta de dados sobre vacinas e Covid-19
+
+paths:
+  /vaccines:
+    get:
+      summary: Lista todas as vacinas
+      description: Retorna todas as vacinas registradas com seu nome, ID e data de primeiro uso global.
+      tags: [Vaccines]
+      responses:
+        '200':
+          description: Lista de vacinas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaccinesResponse'
+
+  /vaccines/{vaccineID}/used-by:
+    get:
+      summary: Lista países que usaram uma vacina específica
+      description: Retorna os países que utilizaram uma vacina identificada por ID, com a data do primeiro uso em cada país.
+      tags: [Vaccines]
+      parameters:
+        - name: vaccineID
+          in: path
+          required: true
+          description: ID numérico da vacina
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de países com datas de uso da vacina
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+
+  /vaccines/used-in/{country}:
+    get:
+      summary: Lista vacinas usadas em um país
+      description: Retorna as vacinas que foram aplicadas em determinado país.
+      tags: [Vaccines]
+      parameters:
+        - name: country
+          in: path
+          required: true
+          description: "Código ISO3 do país (ex: BRA, USA)"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de vacinas usadas em um país
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+
+  /vaccines/first-use:
+    get:
+      summary: Datas de primeiro uso global de vacinas
+      description: Retorna todas as vacinas com a data de início de uso global.
+      tags: [Vaccines]
+      responses:
+        '200':
+          description: Lista global de vacinas e datas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+
+  /covid-stats/{country}/{date}:
+    get:
+      summary: Casos e mortes acumuladas por país e data
+      description: Retorna os casos e mortes acumulados de Covid-19 para um país em uma data específica.
+      tags: [CovidStats]
+      parameters:
+        - name: country
+          in: path
+          required: true
+          description: Código ISO3 do país
+          schema:
+            type: string
+        - name: date
+          in: path
+          required: true
+          description: Data no formato YYYY-MM-DD
+          schema:
+            type: string
+            format: date
+        - name: only-news
+          in: query
+          required: false
+          description: "Se true, retorna apenas os novos casos e mortes do dia."
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Casos e mortes acumulados ou novos no dia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CovidStatsResponse'
+
+  /covid-stats/{date}:
+    get:
+      summary: Casos e mortes globais em uma data
+      description: Retorna os casos e mortes acumulados globalmente em uma data.
+      tags: [CovidStats]
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: Data no formato YYYY-MM-DD
+          schema:
+            type: string
+            format: date
+        - name: only-news
+          in: query
+          required: false
+          description: "Se true, retorna apenas os novos casos e mortes do dia."
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Casos e mortes globais
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CovidStatsResponse'
+
+  /vaccination/{country}/{date}:
+    get:
+      summary: Total de vacinados por país e data
+      description: Retorna o total de pessoas vacinadas com pelo menos uma dose em determinado país e data.
+      tags: [Vaccination]
+      parameters:
+        - name: country
+          in: path
+          required: true
+          description: Código ISO3 do país
+          schema:
+            type: string
+        - name: date
+          in: path
+          required: true
+          description: Data no formato YYYY-MM-DD
+          schema:
+            type: string
+            format: date
+        - name: only-news
+          in: query
+          required: false
+          description: "Se true, retorna apenas o número de vacinados no dia."
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Número de vacinados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaccinationResponse'
+
+  /vaccination/{date}:
+    get:
+      summary: Total de vacinados globalmente em uma data
+      description: Retorna o número de pessoas vacinadas globalmente com pelo menos uma dose em uma data específica.
+      tags: [Vaccination]
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: Data no formato YYYY-MM-DD
+          schema:
+            type: string
+            format: date
+        - name: only-news
+          in: query
+          required: false
+          description: "Se true, retorna apenas o número de vacinados no dia."
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Total de vacinados globalmente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaccinationResponse'
+
+components:
+  schemas:
+    Vaccine:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        first_global_use:
+          type: string
+          format: date
+
+    VaccinesResponse:
+      type: object
+      properties:
+        vaccines:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vaccine'
+
+    UsageEntry:
+      type: object
+      properties:
+        country:
+          type: string
+        vaccine:
+          type: string
+        first_use:
+          type: string
+          format: date
+
+    UsageResponse:
+      type: object
+      properties:
+        context:
+          type: string
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageEntry'
+
+    CovidStatsResponse:
+      type: object
+      properties:
+        country:
+          type: string
+        date:
+          type: string
+        onlyNews:
+          type: boolean
+        cases:
+          type: integer
+        deaths:
+          type: integer
+
+    VaccinationResponse:
+      type: object
+      properties:
+        country:
+          type: string
+        date:
+          type: string
+        onlyNews:
+          type: boolean
+        vaccinated:
+          type: integer
