@@ -1,8 +1,10 @@
-package usedvaccines
+package vaccines
 
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -10,7 +12,7 @@ import (
 	"github.com/biiafranca/viralgraph/api/utils"
 )
 
-func HandleUsedVaccines(w http.ResponseWriter, r *http.Request) {
+func HandleUsedInCountry(w http.ResponseWriter, r *http.Request) {
 
 	country := strings.ToUpper(r.PathValue("country"))
 	if country == "" {
@@ -23,8 +25,8 @@ func HandleUsedVaccines(w http.ResponseWriter, r *http.Request) {
 	defer session.Close(ctx)
 
 	query := `
-		MATCH (c:Country {iso3: $country})-[:USES]->(v:Vaccine)
-		RETURN v.name AS vaccine
+		MATCH (c:Country {iso3: $country})-[r:USES]->(v:Vaccine)
+		RETURN v.name AS vaccine, r.first_used AS date
 		ORDER BY vaccine
 	`
 
@@ -32,25 +34,30 @@ func HandleUsedVaccines(w http.ResponseWriter, r *http.Request) {
 
 	result, err := session.Run(ctx, query, params)
 	if err != nil {
+		log.Printf("Neo4j query failed: %v", err)
 		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to query database")
 		return
 	}
 
-	var vaccines []string
+	var vaccineUsage []UsageEntry
 	for result.Next(ctx) {
 		record := result.Record()
 		vaccine, _ := record.Get("vaccine")
-		vaccines = append(vaccines, vaccine.(string))
+		date, _ := record.Get("date")
+		vaccineUsage = append(vaccineUsage, UsageEntry{
+			Vaccine:  vaccine.(string),
+			FirstUse: fmt.Sprint(date),
+		})
 	}
 
-	if len(vaccines) == 0 {
+	if len(vaccineUsage) == 0 {
 		utils.RespondWithError(w, http.StatusNotFound, "No vaccines found for this country")
 		return
 	}
 
-	response := UsedVaccinesResponse{
-		Country:      country,
-		UsedVaccines: vaccines,
+	response := UsageResponse{
+		Context: country,
+		Entries: vaccineUsage,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
