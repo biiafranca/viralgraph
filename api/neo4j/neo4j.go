@@ -1,10 +1,10 @@
 package neo4j
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
-	"context"
 
 	"github.com/joho/godotenv"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -14,9 +14,12 @@ import (
 var Driver neo4j.DriverWithContext
 
 func init() {
-	envErr := godotenv.Load("../.env")
-	if envErr != nil {
-		log.Fatal("Error loading .env file")
+
+	if os.Getenv("DOCKER_ENV") != "true" {
+		envErr := godotenv.Load("../.env")
+		if envErr != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 
 	uri := os.Getenv("NEO4J_URI")
@@ -28,7 +31,7 @@ func init() {
 		neo4j.BasicAuth(user, password, ""),
 		func(config *config.Config) {
 			config.SocketConnectTimeout = 5 * time.Second
-			config.MaxConnectionPoolSize = 10 // opcional, bom para limitar threads
+			config.MaxConnectionPoolSize = 10 // limit threads
 		},
 	)
 	if driverErr != nil {
