@@ -3,6 +3,7 @@ package vaccination
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -52,6 +53,7 @@ func handleAccumulated(w http.ResponseWriter, country, date string) {
 
 	result, err := session.Run(ctx, query, params)
 	if err != nil {
+		log.Printf("Neo4j query failed: %v", err)
 		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to query database")
 		return
 	}
