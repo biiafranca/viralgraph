@@ -132,6 +132,20 @@ Consideramos desnecessária a existência de um nó exclusivo para representar o
 Além disso, como a fonte de dados não fornece a data oficial da aprovação regulatória, e sim a data do primeiro uso documentado, usamos esta data como proxy para first_global_use. Já o uso específico por país foi modelado como atributo first_used no relacionamento (:Country)-[:USES]->(:Vaccine).
 Essa modelagem simplifica o grafo, evita nós artificiais e mantém a capacidade de responder às perguntas do desafio de forma clara.
 
+🔸 Uso do chunksize ao carregar os dados
+
+A decisão de usar o parâmetro chunksize foi baseada na necessidade de otimizar a performance e evitar sobrecarga de memória no banco de dados Neo4j. Ao processar os dados em lotes controlados, em vez de usar um tamanho indefinido, garantimos que o sistema não sobrecarregue sua memória ao tentar carregar grandes volumes de dados simultaneamente. Essa abordagem também melhora a eficiência ao balancear as operações de leitura e escrita, facilita a escalabilidade ao lidar com grandes volumes de dados e oferece maior controle sobre erros, permitindo a recuperação eficiente sem comprometer todo o processo.
+
+📌 Limitações dos Dados de Vacinação
+Os dados utilizados neste projeto foram fornecidos pela base da Our World in Data (OWID), que disponibiliza estatísticas globais sobre a pandemia de COVID-19. No entanto, vale destacar que essa fonte não possui registros completos de vacinação para todos os países, como é o caso do Brasil, cujos dados de vacinas aplicadas estão ausentes na base atual.
+
+Apesar dessa limitação, a estrutura do projeto permite que a API funcione corretamente e demonstre todas as funcionalidades previstas, utilizando os dados disponíveis.
+
+🚀 Melhorias Futuras: Enriquecimento com Outras Fontes
+Como aprimoramento futuro, é possível realizar o enriquecimento dos dados com fontes alternativas oficiais, como o Ministério da Saúde do Brasil ou bancos de dados regionais com cobertura mais precisa. Essa melhoria traria maior representatividade e completude à análise global.
+
+Contudo, essa etapa foi intencionalmente deixada de fora do escopo original proposto, a fim de manter o foco na implementação da arquitetura da API, modelagem do grafo e demonstração de consultas relevantes sobre os dados já fornecidos.
+
 ---
 
 ## ✅ Exemplo de query possível após a carga

@@ -1,0 +1,51 @@
+# === GO ===
+/api/bin/
+/api/pkg/
+/api/*.exe
+/api/*.out
+/api/*.test
+**/*.test
+**/*.exe
+**/*.out
+go.sum
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env/
+**/.venv/
+**/venv/
+**/ENV/
+**/env.bak/
+*.sqlite3
+
+# pipenv / poetry
+Pipfile.lock
+poetry.lock
+
+# Jupyter / IPython
+.ipynb_checkpoints
+
+# === ENV FILES ===
+.env
+*.env
+
+# === VSCODE ===
+.vscode/
+.history/
+
+# === OS/Editor stuff ===
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
