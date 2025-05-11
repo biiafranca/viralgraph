@@ -1,4 +1,8 @@
 import pandas as pd
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
 
 # ===================== MAIN DATA =====================
 covid_data = "https://covid.ourworldindata.org/data/owid-covid-data.csv"
@@ -19,7 +23,7 @@ countries.rename(columns={
     'location': 'name'
 }, inplace=True)
 countries = countries[['id', 'name', 'iso3']]
-countries.to_csv("etl/data/countries.csv", index=False)
+countries.to_csv(f"{DATA_DIR}/countries.csv", index=False)
 print(f"Saving countries.csv with {len(countries)} rows...")
 
 # ===================== NODE: CovidCase =====================
@@ -31,7 +35,7 @@ covid_cases.rename(columns={
     'total_cases': 'totalCases',
     'total_deaths': 'totalDeaths'
 }, inplace=True)
-covid_cases.to_csv("etl/data/covid_cases.csv", index=False)
+covid_cases.to_csv(f"{DATA_DIR}/covid_cases.csv", index=False)
 print(f"Saving covid_cases.csv with {len(covid_cases)} rows...")
 
 # ===================== NODE: VaccinationStats =====================
@@ -43,21 +47,21 @@ vacc_stats.rename(columns={
     'people_vaccinated': 'totalVaccinated'
 }, inplace=True)
 vacc_stats['totalVaccinated'] = vacc_stats['totalVaccinated'].astype(int)
-vacc_stats.to_csv("etl/data/vaccination_stats.csv", index=False)
+vacc_stats.to_csv(f"{DATA_DIR}/vaccination_stats.csv", index=False)
 print(f"Saving vaccination_stats.csv with {len(vacc_stats)} rows...")
 
 # ===================== RELATIONSHIP: HAS_CASE =====================
 has_case = covid_cases[['country_iso', 'id']].rename(columns={
     'id': 'covidcase_id'
 })
-has_case.to_csv("etl/data/has_case.csv", index=False)
+has_case.to_csv(f"{DATA_DIR}/has_case.csv", index=False)
 print(f"Saving has_case.csv with {len(has_case)} rows...")
 
 # ===================== RELATIONSHIP: VACCINATED_ON =====================
 vaccinated_on = vacc_stats[['country_iso', 'id']].rename(columns={
     'id': 'vaccstats_id'
 })
-vaccinated_on.to_csv("etl/data/vaccinated_on.csv", index=False)
+vaccinated_on.to_csv(f"{DATA_DIR}/vaccinated_on.csv", index=False)
 print(f"Saving vaccinated_on.csv with {len(vaccinated_on)} rows...")
 
 # ===================== VACCINE MANUFACTURER DATA =====================
@@ -79,7 +83,7 @@ df_vac_by_manuf = pd.concat([df_vac_by_manuf, df_vac_br], ignore_index=True)
 vaccines = df_vac_by_manuf.groupby('vaccine')['date'].min().reset_index().copy()
 vaccines['id'] = range(1, len(vaccines) + 1)
 vaccines.rename(columns={'date': 'first_global_use'}, inplace=True)
-vaccines.to_csv("etl/data/vaccines.csv", index=False)
+vaccines.to_csv(f"{DATA_DIR}/vaccines.csv", index=False)
 print(f"Saving vaccines.csv with {len(vaccines)} rows...")
 
 # ===================== RELATIONSHIP: USES =====================
@@ -101,5 +105,5 @@ if missing_data > 0:
 uses = uses_raw_valid.groupby(['country_iso', 'vaccine'])['date'].min().reset_index()
 uses.rename(columns={'date': 'first_used'}, inplace=True)
 
-uses.to_csv("etl/data/uses.csv", index=False)
+uses.to_csv(f"{DATA_DIR}/uses.csv", index=False)
 print(f"Saving uses.csv with {len(uses)} rows...")
