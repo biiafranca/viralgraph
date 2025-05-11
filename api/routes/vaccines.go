@@ -1,3 +1,9 @@
+// Package routes defines the application's URL routing.
+// This file registers all routes related to COVID-19 vaccines,
+// and connects each endpoint to its corresponding handler.
+//
+// Specifically, it defines routes for the /vaccines endpoints.
+
 package routes
 
 import (

@@ -1,3 +1,12 @@
+// Package vaccines handles COVID-19 vaccines information.
+// Defines response data structures used across vaccines handlers.
+//
+// Usage-related types (UsageEntry, UsageResponse) are used to represent generic
+// statistics of vaccine usage, either by country or by vaccine.
+//
+// Vaccine-related types (Vaccine, VaccinesResponse) focus on providing general
+// metadata about each vaccine.
+
 package vaccines
 
 type UsageEntry struct {

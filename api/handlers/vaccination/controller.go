@@ -1,3 +1,8 @@
+// Package vaccination handles COVID-19 vaccination statistics.
+// This file routes incoming HTTP requests to the appropriate handler based on the URL and query parameters.
+//
+// It supports both accumulated and daily data, at country or global level.
+
 package vaccination
 
 import (

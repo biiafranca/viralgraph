@@ -1,3 +1,7 @@
+// Package vaccines handles COVID-19 vaccines information.
+//
+// It returns the date of global first use of each registered vaccine.
+
 package vaccines
 
 import (

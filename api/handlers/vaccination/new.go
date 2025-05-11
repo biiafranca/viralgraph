@@ -1,11 +1,18 @@
+// Package vaccination handles COVID-19 vaccination statistics.
+// This file implements logic for calculating *new daily vaccinations*.
+//
+// The handler defined here is used when the `onlyNews` parameter is true.
+// It returns the difference between the requested date and the most recent prior date,
+// effectively showing the new vaccinations for the given day.
+
 package vaccination
 
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
-	"log"
 
 	"github.com/biiafranca/viralgraph/api/neo4j"
 	"github.com/biiafranca/viralgraph/api/utils"

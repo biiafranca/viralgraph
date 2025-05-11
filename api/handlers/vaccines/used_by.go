@@ -1,3 +1,8 @@
+// Package vaccines handles COVID-19 vaccines information.
+//
+// Returns the countries in which the given vaccineID was used and
+// the date of first use in each country.
+
 package vaccines
 
 import (

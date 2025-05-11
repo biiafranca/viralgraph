@@ -1,3 +1,10 @@
+// Package vaccination handles COVID-19 vaccination statistics.
+// This file contains the logic for calculating *accumulated* total
+// of people vaccinated with at least one dose of the vaccine.
+//
+// It is used when the `onlyNews` parameter is false or absent.
+// The total reflects the last known values *on or before* the requested date.
+
 package vaccination
 
 import (

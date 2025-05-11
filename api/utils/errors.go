@@ -1,3 +1,7 @@
+// Package utils offers helper functions for HTTP responses.
+//
+// This file handles standardized error formatting in JSON.
+
 package utils
 
 import (

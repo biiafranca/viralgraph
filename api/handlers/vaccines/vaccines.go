@@ -1,3 +1,7 @@
+// Package vaccines handles COVID-19 vaccines information.
+//
+// Returns the vaccines registered in the database and their general info, including the vaccine ID.
+
 package vaccines
 
 import (

@@ -1,3 +1,8 @@
+// Package vaccines handles COVID-19 vaccines information.
+//
+// Returns the vaccines used in the given country (by the informed iso3 code)
+// and the date of first use in this country.
+
 package vaccines
 
 import (
