@@ -1,3 +1,5 @@
+// Package neo4j provides Neo4j driver setup and session access.
+
 package neo4j
 
 import (

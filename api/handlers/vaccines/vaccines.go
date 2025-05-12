@@ -1,9 +1,14 @@
+// Package vaccines handles COVID-19 vaccines information.
+//
+// Returns the vaccines registered in the database and their general info, including the vaccine ID.
+
 package vaccines
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/biiafranca/viralgraph/api/neo4j"
@@ -24,6 +29,7 @@ func HandleVaccines(w http.ResponseWriter, r *http.Request) {
 
 	result, err := session.Run(ctx, query, nil)
 	if err != nil {
+		log.Printf("Neo4j query failed: %v", err)
 		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to query database")
 		return
 	}

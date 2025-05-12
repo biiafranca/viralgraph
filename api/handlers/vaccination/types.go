@@ -1,3 +1,6 @@
+// Package vaccination handles COVID-19 vaccination statistics.
+// Defines response data structures used across vaccination handlers.
+
 package vaccination
 
 type VaccinationResponse struct {

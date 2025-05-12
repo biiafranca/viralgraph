@@ -10,6 +10,7 @@ package covidstats
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -73,6 +74,7 @@ func handleNew(w http.ResponseWriter, country, date string) {
 
 	currentRes, err := session.Run(ctx, currentQuery, params)
 	if err != nil {
+		log.Printf("Neo4j query failed: %v", err)
 		utils.RespondWithError(w, http.StatusInternalServerError, "Failed to query current date data")
 		return
 	}
