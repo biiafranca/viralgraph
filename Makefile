@@ -1,3 +1,8 @@
+generate-env:
+	echo "NEO4J_USER=neo4j" > .env
+	echo "NEO4J_PASSWORD=<password>" >> .env
+	@echo ".env created with success!"
+
 build:
 	docker-compose build
 
