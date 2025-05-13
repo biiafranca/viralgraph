@@ -2,7 +2,6 @@
 
 Este módulo é responsável por extrair, transformar e carregar os dados sobre a pandemia de COVID-19 em um banco de dados de grafos Neo4j. 
 
----
 
 ## 🔧 Tecnologias utilizadas
 
@@ -10,9 +9,6 @@ Este módulo é responsável por extrair, transformar e carregar os dados sobre 
 - **Pandas** para manipulação de dados
 - **Neo4j** como banco de grafos
 - **Driver oficial Neo4j (`neo4j`)** para conexão via Bolt
-- **dotenv** para gerenciar variáveis sensíveis
-
----
 
 ## 📁 Estrutura
 
@@ -23,10 +19,7 @@ etl/
 ├── load_to_neo4j.py           # Carrega os dados no Neo4j com UNWIND
 ├── README.md
 ├── requirements.txt
-├── .env
 ```
-
----
 
 ## ⚙️ Configuração
 
@@ -38,8 +31,6 @@ NEO4J_USER=neo4j
 NEO4J_PASSWORD=sua_senha_aqui
 ```
 
----
-
 📦 Instalação das dependências
 
 Para execução local, execute o seguinte comando para instalar os pacotes necessários à execução da ETL:
@@ -47,8 +38,6 @@ Para execução local, execute o seguinte comando para instalar os pacotes neces
 ```
 pip install -r etl/requirements.txt
 ```
-
----
 
 ## 🚀 Etapas do ETL
 
@@ -95,7 +84,6 @@ Este script:
 - Converte datas para o tipo `date` do Neo4j
 - Usa `MERGE` para evitar duplicatas e `SET` para atualizar atributos
 
----
 
 ## 💡 Decisões técnicas
 
@@ -116,6 +104,7 @@ Foram extraídos os seguintes dados:
   - 'total_cases': total acumulado de casos na data
   - 'total_deaths': total acumulado de mortes na data
   - 'people_vaccinated': pessoas vacinadas com no mínimo uma dose da vacina, total acumulado
+    
 - vaccinations-by-manufacturer.csv:
   - 'location': Nome do país, em inglês
   - 'date': Data relativa ao dado 
