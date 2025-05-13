@@ -42,13 +42,19 @@ ViralGraph/
 
 ### Passos
 
-1. Inicie todos os serviços com:
+1. Crie o arquivo .env, executando (da raiz do projeto):
+```
+make generate-env
+```
+E, altere a variável NEO4J_PASSWORD para uma senha segura (diferente da senha padrão 'neo4j')
+  
+2. Inicie todos os serviços com:
 
 ```
 make start
 ```
 
-2. Acesse a API em http://localhost:8080 e o Neo4j Browser em http://localhost:7474
+3. Para acessar a API use o endereço http://localhost:8080 e para o Neo4j Browser http://localhost:7474
 
 ## 🧪 Testes
 
