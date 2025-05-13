@@ -77,6 +77,10 @@ Por simplicidade inicial, os testes possuem as seguintes limitações:
 
 A documentação modelo OpenAPI (.yaml) foi gerada de forma estática. Porém, para aplicação futura, é possível implementar alguma biblioteca de geração automática da documentação, como a Swaggo, para facilitar a atualização da documentação no decorrer do desenvolvimento da API.
 
+### 🔸**Configuração das portas "chumbada"**
+
+A API fica disponível na porta 8080, e o Neo4j na porta 7474. Para alterar esses valores é necessário editar o docker-compose.yml. Para aderir a melhores práticas, está mapeada a melhoria para dinamizar as portas de acordo com variáveis de ambiente.
+
 ### 🔸**Organização modular da API**: 
 
 Rotas e handlers foram separados por domínio (`covidstats`, `vaccinations`, `vaccines`).
