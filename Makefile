@@ -22,5 +22,8 @@ etl-refresh:
 start:
 	make build && make up && make etl-refresh
 
+test:
+	docker-compose run --rm api-test
+
 clean:
 	docker-compose down -v --remove-orphans

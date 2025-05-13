@@ -59,14 +59,14 @@ func handleNew(w http.ResponseWriter, country, date string) {
 			RETURN sum(cc.totalCases) AS totalCases, sum(cc.totalDeaths) AS totalDeaths
 		`
 		previousQuery = `
-			MATCH (c:Country)-[:HAS_CASE]->(cc:CovidCase)
-			WHERE cc.date = date($date)
+			MATCH (c:Country)-[:HAS_CASE]->(cur:CovidCase)
+			WHERE cur.date = date($date)
 			WITH c
 
-			MATCH (c)-[:HAS_CASE]->(cc:CovidCase)
-			WHERE cc.date < date($date)
-			WITH c, cc ORDER BY cc.date DESC
-			WITH c, collect(cc)[0] AS latest
+			MATCH (c)-[:HAS_CASE]->(prev:CovidCase)
+			WHERE prev.date < date($date)
+			WITH c, prev ORDER BY prev.date DESC
+			WITH c, collect(prev)[0] AS latest
 			RETURN sum(latest.totalCases) AS totalCases, sum(latest.totalDeaths) AS totalDeaths
 		`
 		params = map[string]interface{}{"date": date}

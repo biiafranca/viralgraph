@@ -7,7 +7,6 @@
 **/*.test
 **/*.exe
 **/*.out
-go.sum
 
 # === PYTHON ===
 __pycache__/
@@ -27,13 +26,6 @@ build/
 **/ENV/
 **/env.bak/
 *.sqlite3
-
-# pipenv / poetry
-Pipfile.lock
-poetry.lock
-
-# Jupyter / IPython
-.ipynb_checkpoints
 
 # === ENV FILES ===
 .env

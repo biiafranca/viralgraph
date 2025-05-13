@@ -1,0 +1,258 @@
+{
+	"info": {
+		"_postman_id": "8ee8ce55-b296-4e3c-9cae-a88622aee7b4",
+		"name": "ViralGraph - Respostas ao Desafio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44632666",
+		"_collection_link": "https://bianca-3591947.postman.co/workspace/Bianca's-Workspace~a348bca2-d8a6-4c59-8fbb-8d1fa6b379f7/collection/44632666-8ee8ce55-b296-4e3c-9cae-a88622aee7b4?action=share&source=collection_link&creator=44632666"
+	},
+	"item": [
+		{
+			"name": "1. Total acumulado de casos e mortes em um país (ex: Brasil)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/covid-stats/BRA/2021-08-01",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"covid-stats",
+						"BRA",
+						"2021-08-01"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Total de vacinados com ao menos uma dose em um país (ex: Brasil)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccination/BRA/2021-08-01",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccination",
+						"BRA",
+						"2021-08-01"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Vacinas usadas em um país (ex: Brasil)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccines/used-in/BRA",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccines",
+						"used-in",
+						"BRA"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Datas de aprovação (primeiro uso) das vacinas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccines/first-use",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccines",
+						"first-use"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Países que usaram uma vacina (ex: Pfizer)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccines/8/used-by",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccines",
+						"8",
+						"used-by"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Primeiro uso de cada vacina em um país (ex: Brasil)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccines/used-in/BRA",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccines",
+						"used-in",
+						"BRA"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Novos casos e mortes em um país (ex: Brasil)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/covid-stats/BRA/2021-08-01?only-news=true?only-news=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"covid-stats",
+						"BRA",
+						"2021-08-01"
+					],
+					"query": [
+						{
+							"key": "only-news",
+							"value": "true?only-news=true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Total global de casos e mortes (acumulados)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/covid-stats/2021-08-01",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"covid-stats",
+						"2021-08-01"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Total global de casos e mortes (novos)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/covid-stats/2021-08-01?only-news=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"covid-stats",
+						"2021-08-01"
+					],
+					"query": [
+						{
+							"key": "only-news",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. Novas vacinações em um país (ex: Brasil)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccination/BRA/2021-08-01?only-news=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccination",
+						"BRA",
+						"2021-08-01"
+					],
+					"query": [
+						{
+							"key": "only-news",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. Total global de vacinações (acumuladas)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccination/2021-07-31",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccination",
+						"2021-07-31"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. Total global de vacinações (novas)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/vaccination/2021-08-01?only-news=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"vaccination",
+						"2021-08-01"
+					],
+					"query": [
+						{
+							"key": "only-news",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
