@@ -42,7 +42,7 @@ NEO4J_PASSWORD=sua_senha_aqui
 
 📦 Instalação das dependências
 
-Execute o seguinte comando para instalar os pacotes necessários à execução da ETL:
+Para execução local, execute o seguinte comando para instalar os pacotes necessários à execução da ETL:
 
 ```
 pip install -r etl/requirements.txt
@@ -54,9 +54,14 @@ pip install -r etl/requirements.txt
 
 ### 1. Geração dos CSVs
 
-Execute:
+Localmente, execute:
 ```bash
 python etl/generate_graph_data.py
+```
+
+Para execução via docker-compose:
+```
+make etl-generate:
 ```
 
 Este script:
@@ -74,9 +79,14 @@ Este script:
 
 ### 2. Carga no Neo4j
 
-Execute:
+Localmente, execute:
 ```bash
 python etl/load_to_neo4j.py
+```
+
+Para execução via docker-compose:
+```
+make etl-load
 ```
 
 Este script:
@@ -89,17 +99,37 @@ Este script:
 
 ## 💡 Decisões técnicas
 
+🔸 Linguagem escolhida para a ETL
+
+A linguagem Python foi escolhida para a construção da ferramenta de ETL devido à sua maturidade no ecossistema de manipulação de dados, especialmente com a biblioteca pandas. Apesar de o projeto utilizar Go no desenvolvimento da API, o Python proporcionou maior agilidade no tratamento e transformação dos dados.
+
 🔸 Fonte de dados escolhida (OWID)
 
 A base de dados da Our World in Data (OWID) foi escolhida por ser amplamente reconhecida, de acesso público, e por disponibilizar dados consistentes e atualizados sobre casos de COVID-19, mortes, vacinação e uso por fabricante. Ela oferece formatos acessíveis (CSV via URL), estrutura padronizada e boa documentação, facilitando a automação da ETL e garantindo confiabilidade nas análises.
 
-🔸 Linguagem escolhida para a ETL
+Foram extraídos os seguintes dados:
 
-A linguagem Python foi escolhida para a construção da ferramenta de ETL devido à sua ampla maturidade no ecossistema de manipulação de dados, especialmente com bibliotecas como pandas. Apesar de o projeto utilizar Go em outras partes, o Python proporcionou maior agilidade no tratamento e transformação dos dados tabulares.
+- owid-covid-data.csv:
+  - 'iso_code': Código iso3 do país
+  - 'location': Nome do país, em inglês
+  - 'date': Data relativa ao dado
+  - 'total_cases': total acumulado de casos na data
+  - 'total_deaths': total acumulado de mortes na data
+  - 'people_vaccinated': pessoas vacinadas com no mínimo uma dose da vacina, total acumulado
+- vaccinations-by-manufacturer.csv:
+  - 'location': Nome do país, em inglês
+  - 'date': Data relativa ao dado 
+  - 'vaccine': Nome da vacina
+
+Como o vaccinations-by-manufacturer.csv não contém informações relativas a todos os países, os dados foram enriquecidos com informações específicas do Brasil, para demonstração.
+
+- country_data/Brazil.csv:
+  - 'date': Data relativa ao dado 
+  - 'vaccine': Nome da vacina
 
 🔸 Identificadores numéricos (id)
 
-Foi escolhida a utilização de identificadores numéricos inteiros nos nós que exigem unicidade (CovidCase, VaccinationStats, etc.), garantindo maior performance e padronização. Essa decisão também facilita integrações futuras com bancos relacionais.
+Foi escolhida a utilização de identificadores numéricos inteiros, pois, de acordo com as pesquisas realizadas, no banco de dados Neo4J a ordenação, indexação e busca por igualdade são muito rápidas com números do que com strings, byte a byte.
 
 🔸 Inclusão de ID em nós que não são identificados por ele
 
@@ -107,44 +137,34 @@ Mesmo nos nós Country e Vaccine, onde a identificação primária é feita por 
 
 🔸 Modelagem de relacionamentos Country → CovidCase
 
-Embora o modelo sugerido inicialmente relacionasse Country e CovidCase apenas pela data, essa abordagem foi considerada inadequada, uma vez que vários países podem ter registros para a mesma data. Assim, o relacionamento foi implementado com base no identificador exclusivo de cada CovidCase, garantindo integridade e unicidade no grafo.
+Embora o modelo sugerido inicialmente relacionasse Country e CovidCase apenas pela data, essa abordagem foi considerada inadequada, uma vez que vários países podem ter registros para a mesma data. Assim, o relacionamento considerou também o iso3 do país.
 
 🔸 Uso de MERGE + SET
 
-Optamos por MERGE (a)-[r:REL]->(b) seguido de SET r.prop = ... para evitar múltiplos relacionamentos com atributos diferentes e permitir atualizações sem duplicações.
+Foi utilizado o MERGE (a)-[r:REL]->(b) seguido de SET r.prop = ... para permitir atualizações sem duplicações.
 
 🔸 Conversão de datas
 
 As datas foram explicitamente convertidas com date(...) no Cypher, para permitir consultas com filtros de data no formato nativo do Neo4j.
 
-🔸 Performance com UNWIND
+🔸 Performance com UNWIND e chunksize ao carregar os dados
 
-Toda a carga de dados foi otimizada com UNWIND, reduzindo drasticamente o número de comandos e aumentando a escalabilidade do processo.
+Toda a carga de dados foi otimizada com UNWIND, reduzindo drasticamente o número de comandos e aumentando a escalabilidade do processo. Foi definido um chunksize de 1000 linhas em cada lote carregado, para evitar sobrecarga de memória no banco de dados Neo4j. Ao processar os dados em lotes controlados, em vez de usar um tamanho indefinido, garantimos que o sistema não sobrecarregue sua memória ao tentar carregar grandes volumes de dados simultaneamente 
 
 🔸 Eliminação do nó VaccineApproval
 
-Consideramos desnecessária a existência de um nó exclusivo para representar o evento de aprovação de uma vacina, especialmente porque:
+Não foi utilizado um nó exclusivo para representar o evento de aprovação de uma vacina, especialmente porque:
 
 - Ele não traria nenhuma propriedade relevante além da data
 - Não haveria relacionamento com os países, tornando o nó isolado
 - A informação de aprovação poderia ser mais bem representada como atributo no próprio nó Vaccine
 
-Além disso, como a fonte de dados não fornece a data oficial da aprovação regulatória, e sim a data do primeiro uso documentado, usamos esta data como proxy para first_global_use. Já o uso específico por país foi modelado como atributo first_used no relacionamento (:Country)-[:USES]->(:Vaccine).
+Além disso, como a fonte de dados não fornece a data oficial da aprovação regulatória, e sim a data do primeiro uso documentado, foi utilizada esta data para inferir o dado como first_global_use. Já o uso específico por país foi modelado como atributo first_used no relacionamento (:Country)-[:USES]->(:Vaccine).
 Essa modelagem simplifica o grafo, evita nós artificiais e mantém a capacidade de responder às perguntas do desafio de forma clara.
 
-🔸 Uso do chunksize ao carregar os dados
+🔸 Melhorias Futuras: Enriquecimento com Outras Fontes
 
-A decisão de usar o parâmetro chunksize foi baseada na necessidade de otimizar a performance e evitar sobrecarga de memória no banco de dados Neo4j. Ao processar os dados em lotes controlados, em vez de usar um tamanho indefinido, garantimos que o sistema não sobrecarregue sua memória ao tentar carregar grandes volumes de dados simultaneamente. Essa abordagem também melhora a eficiência ao balancear as operações de leitura e escrita, facilita a escalabilidade ao lidar com grandes volumes de dados e oferece maior controle sobre erros, permitindo a recuperação eficiente sem comprometer todo o processo.
-
-📌 Limitações dos Dados de Vacinação
-Os dados utilizados neste projeto foram fornecidos pela base da Our World in Data (OWID), que disponibiliza estatísticas globais sobre a pandemia de COVID-19. No entanto, vale destacar que essa fonte não possui registros completos de vacinação para todos os países, como é o caso do Brasil, cujos dados de vacinas aplicadas estão ausentes na base atual.
-
-Apesar dessa limitação, a estrutura do projeto permite que a API funcione corretamente e demonstre todas as funcionalidades previstas, utilizando os dados disponíveis.
-
-🚀 Melhorias Futuras: Enriquecimento com Outras Fontes
-Como aprimoramento futuro, é possível realizar o enriquecimento dos dados com fontes alternativas oficiais, como o Ministério da Saúde do Brasil ou bancos de dados regionais com cobertura mais precisa. Essa melhoria traria maior representatividade e completude à análise global.
-
-Contudo, essa etapa foi intencionalmente deixada de fora do escopo original proposto, a fim de manter o foco na implementação da arquitetura da API, modelagem do grafo e demonstração de consultas relevantes sobre os dados já fornecidos.
+Como aprimoramento futuro, é possível realizar o enriquecimento dos dados com fontes alternativas oficiais, como o Ministério da Saúde do Brasil ou bancos de dados regionais com cobertura mais precisa. Essa melhoria traria maior representatividade e completude à análise global. Contudo, essa etapa foi intencionalmente deixada de fora do escopo original proposto, a fim de manter o foco na implementação da arquitetura da API, modelagem do grafo e demonstração de consultas relevantes sobre os dados já fornecidos.
 
 ---
 
@@ -161,8 +181,4 @@ RETURN cc.totalCases, cc.totalDeaths
 ## 📌 Observações finais
 
 - O script foi testado com mais de 450 mil registros e manteve estabilidade.
-- A limpeza de dados alfabéticos nos campos numéricos não foi aplicada, mas é prevista como melhoria futura.
-
----
-
-Para dúvidas ou contribuições, consulte o `README.md` principal do projeto.
+- Em caso de dúvidas, consulte também o `README.md` principal do projeto.
